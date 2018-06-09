@@ -1,0 +1,12 @@
+---#AWS Gather EC2 Facts
+- hosts: aws
+  remote_user: ec2-user
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh 
+  tasks:
+  - name: GAther EC2 facts about ryunning stances
+    action: ec2_facts
+  - name: Conditionla Display the instance type
+    debug: msg="This Instance is a t2 micro"
+    when: ansible_ec2_instance_type == 't2.micro'

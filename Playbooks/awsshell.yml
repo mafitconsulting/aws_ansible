@@ -1,0 +1,12 @@
+--- # AWS EC2 Instance communication shell command
+- hosts: aws
+  remote_user: ec2-user
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh 
+  tasks:
+    - name: Execute a Shell Command for listing remote dir
+      shell: ls -al ~
+      register: result
+    - name: Display the results in JSON format
+      debug: var=result 

@@ -1,0 +1,17 @@
+--- #AWS EC2 Keys 
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - files/aws_creds.yml
+  tasks:
+    - name: Create a New Key Pair - AnsibleKeyPair
+      ec2_key: 
+        aws_access_key: "{{ aws_id }}"
+        aws_secret_key: "{{ aws_key }}"
+        name: AnsibleKeyPair
+        region: eu-west-1
+        state: absent
+
