@@ -1,0 +1,24 @@
+--- # EC2 group module example
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Basic security group 
+      ec2_group:
+        region: eu-west-1
+        name: MyTestGroup
+        description: This is the EC2 Group demo
+        vpc_id: vpc-68fde40d # eu-west-1
+        rules:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+

@@ -1,0 +1,18 @@
+--- #Ec2 provisioning
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - files/aws_creds.yml
+  tasks:
+    - name: Basic provisioning of two t2 micro instances
+      ec2:
+        aws_access_key: "{{ aws_id }}"
+        aws_secret_key: "{{ aws_key }}"
+        region: "{{aws_region}}"
+        image: ami-ca0135b3
+        instance_type: t2.micro
+        count: 2
+    

@@ -1,0 +1,14 @@
+--- #EC2 start/stop module use
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+  - files/aws_creds.yml
+  tasks:
+  - name: Manage state of instance
+    ec2:
+      region: "{{ aws_region }}" 
+      instance_ids: i-094fc8af16f7a5bcf
+      state: stopped

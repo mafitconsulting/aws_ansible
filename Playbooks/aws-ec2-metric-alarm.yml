@@ -1,0 +1,22 @@
+--- #EC2 Metric Alarm
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Create a basic CPU alarm
+      ec2_metric_alarm:
+        region: eu-west-1
+        state: present
+        name: OurFirstAlarm
+        metric: "CPUUtilization"
+        namespace: "AWS/EC2"
+        statistic: Average
+        comparison: ">="
+        threshold: 25.0
+        period: 300
+        evaluation_periods: 6
+        unit: "Percent"
+        description: "This alarm fires when CPU > 25% for 30 minutes"
+        dimensions: {'InstanceID':'i-094fc8af16f7a5bcf'}

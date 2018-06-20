@@ -1,0 +1,20 @@
+--- #EC2 ami image fine
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: EC2 AMI find 
+      ec2_ami_find:
+        region: eu-west-1
+        owner: self # we own this ami
+        ami_tags:
+          Name: MyNewAMI
+        no_result_action: fail
+      register: ami_find
+    - debug: msg={{ ami_find.results[0].ami_id }}
+    - debug: msg={{ ami_find.results[0].name }}
+
+  
+# 

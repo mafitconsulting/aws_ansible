@@ -1,0 +1,20 @@
+--- #Copy AMY to regions
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - files/aws_creds.yml
+  tasks:
+    - name: copy ami from one regions to another
+      ec2_ami_copy:
+        region: eu-west-2 # region to copy amy to
+        source_region: "{{ aws_region }}"
+        source_image_id: ami-525b59b8
+        wait: no
+        name: euwest2am11
+        tags: 
+          Name: MyNewEUWest2AMI
+          Service: MyNewEUWest2AMIService 
+      register: instance

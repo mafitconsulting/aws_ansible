@@ -1,0 +1,21 @@
+--- #EC2 ami image frim existing images
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - files/aws_creds.yml
+  tasks:
+  - name: Basic provisioning frim ami from instances
+    ec2_ami:
+      region: "{{ aws_region }}"
+      instance_id: i-094fc8af16f7a5bcf
+      wait: no
+      name: mynewami
+      tags:
+        Name: MyNewAMI
+        Service: TestAMIService
+    register: instance
+  
+    

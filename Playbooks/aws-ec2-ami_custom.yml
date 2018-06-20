@@ -1,0 +1,26 @@
+--- #EC2 ami image frim existing images
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - files/aws_creds.yml
+  tasks:
+  - name: more advance ami provisioning from ec2
+    ec2_ami:
+      region: "{{ aws_region }}"
+      instance_id: i-094fc8af16f7a5bcf
+      wait: no
+      name: mynewami2
+      tags:
+        Name: MyNewAMI2
+        Service: TestAMIService2
+      device_mapping:
+        - device_name: /dev/sdb1
+          size: 100
+          delete_on_termination: true
+          volume_type: gp2
+    register: instance
+  
+    
