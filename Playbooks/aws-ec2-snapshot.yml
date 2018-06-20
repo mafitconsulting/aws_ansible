@@ -1,0 +1,21 @@
+--- #EC2 ami image frim existing images
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: EC2 snapshot
+    ec2_snapshot:
+      region: eu-west-1
+      instance_id: i-094fc8af16f7a5bcf
+      description: Snapshot of instance ebs using Ansible
+      device_name: /dev/xvda
+      wait: no
+    register: snapshot
+  - debug: msg= "{{ snapshot }}"
+      
+      
+ 
+  
+    

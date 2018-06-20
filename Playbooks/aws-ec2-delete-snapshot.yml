@@ -1,0 +1,20 @@
+--- #EC2 ami image frim existing images
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: EC2 snapshot
+    ec2_snapshot:
+      region: eu-west-1
+      description: Delete snapshot based on ID
+      snapshot_id: snap-007de90d52c04ce97
+      wait: no
+      state: absent
+    register: snapshot
+      
+      
+ 
+  
+    

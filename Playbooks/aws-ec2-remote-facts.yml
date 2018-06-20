@@ -1,0 +1,12 @@
+--- # EC2 Remote Facts module
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: Gather facts of all running EC2 instances
+    ec2_remote_facts:
+      region: eu-west-1
+    register: remote_facts  
+  - debug: msg={{ remote_facts }}
