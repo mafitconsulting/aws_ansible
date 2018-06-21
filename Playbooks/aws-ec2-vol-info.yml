@@ -1,0 +1,18 @@
+--- # EC2 VOL Modules exmaple
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: Create a new volume and attach to running instance
+    ec2_vol:
+      region: eu-west-1
+      instance: i-094fc8af16f7a5bcf
+      state: list
+    register: volume_result
+  - debug: msg={{ volume_result }}
+      
+      
+      
+  
