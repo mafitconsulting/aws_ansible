@@ -1,17 +1,19 @@
---- # EC2 VOL Modules exmaple
+--- # EC2 TAGGING Modules exmaple
 - hosts: localhost
   connection: local
   remote_user: test
   become_method: sudo
   gather_facts: no
   tasks:
-  - name: Create a new volume and attach to running instance
-    ec2_vol:
+  - name: label an existing volume so we know what it is
+    ec2_tag:
       region: eu-west-1
-      instance: i-094fc8af16f7a5bcf
-      volume_size: 1
-      device_name: sde
-    register: volume_result
+      resource: vol-099595c0731380268
+      state: present
+      tags:
+        Name: data_volume
+    register: voltags
+
       
       
       
