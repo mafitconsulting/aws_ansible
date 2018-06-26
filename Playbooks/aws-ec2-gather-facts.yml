@@ -1,0 +1,24 @@
+--- # EC2 Remote Facts module
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - files/aws_creds.yml
+
+  tasks:
+  - name: Gather facts of all running EC2 instances
+    ec2_vol_facts:
+      region: eu-west-1 
+      filters:
+        attachment.device: ["/dev/xvdb","/dev/xvdc","/dev/xvdd"]
+        #attachment.instance-id: i-094fc8af16f7a5bcf
+    register: remote_facts  
+  - debug: msg={{ remote_facts }}
+  - debug: msg="{{ item.id }}"
+    with_items: "{{ remote_facts.volumes }}"
+  - debug: msg="{{ item.attachment_set.instance_id }}"
+    with_items: "{{ remote_facts.volumes }}"
+
+ 

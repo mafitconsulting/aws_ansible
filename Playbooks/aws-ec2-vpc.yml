@@ -1,0 +1,18 @@
+--- # EC2 VPC Modules exmaple
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: Create a new volume and attach to running instance
+    ec2_vpc:
+      region: eu-west-1
+      instance: i-094fc8af16f7a5bcf
+      volume_size: 1
+      device_name: sde
+    register: volume_result
+      
+      
+      
+  
