@@ -1,0 +1,13 @@
+--- # EC2 VPC Modules exmaple
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: Create a basic VPC using the 10.x.x.x. Private range
+    ec2_vpc_net_facts:
+      region: eu-west-1
+      vpc_ids: vpc-68fde40d
+    register: ec2_vpc_net_facts
+  - debug: var=ec2_vpc_net_facts

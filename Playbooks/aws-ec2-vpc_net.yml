@@ -5,14 +5,15 @@
   become_method: sudo
   gather_facts: no
   tasks:
-  - name: Create a basci VPC using the 10.x.x.x. Private range
+  - name: Create a basic VPC using the 10.x.x.x. Private range
     ec2_vpc_net:
       name: aws_ansible
       region: eu-west-1
       state: present
-      cidr_block: 10.2.1.0/24
+      cidr_block: 172.2.1.0/24
     register: ec2_vpc_block
       
-      
+  - name: Print resulting JSON
+    debug: msg=ec2_vpc_block
       
   
