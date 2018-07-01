@@ -1,0 +1,21 @@
+--- # AWS IAM Module
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: Create a couple of IAM users
+    iam:
+      region: eu-west-1
+      iam_type: user
+      name: "{{ item }}"
+      state: absent
+      password: "Und3rw0ter!£$%^"
+      access_key_state: create
+    with_items:
+      - dave
+      - jim
+    register: iam_users
+  - debug: var=iam_users
+      

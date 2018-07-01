@@ -1,0 +1,29 @@
+--- # AWS IAM Module
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: Create a S3 bucket and copy files to it
+    s3:
+      region: eu-west-1
+      bucket: mafit-ansible
+      mode: delete
+      permission: public-read-write
+    register: s3_mafit_bucket
+
+  - name: copy files to bucket
+    s3:
+      region: eu-west-1
+      bucket: mafit-ansible
+      mode: put
+      object: /Playbooks/aws-ec2-vpc.yml
+      src: /home/test/ansible/Playbooks/aws-ec2-vpc.yml
+    register: copy_files 
+
+  - name: output of creation
+    debug: var=s3_mafit_bucket
+  
+  - name: output of copy
+    debug: var=copy_files

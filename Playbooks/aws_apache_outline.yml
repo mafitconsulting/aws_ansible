@@ -1,0 +1,18 @@
+--- # This is an outline of the tasks our playbook needs to accomplish
+- hosts: localhost, awsinstance
+- sudo
+- connection: local, ssh
+- ssh-agent, ssh-add key
+- gather_facts
+
+- connect to a running instance id
+  - install apache
+  - copy the website
+  - restart apache
+  - test port 80 and the default page
+  - install all nescessary updates
+
+- connect to aws console
+  - backup the web directory (snapshot - /dev/sdb1)
+  - create new template (AMI) from teh running instance
+  - launch a new instance from a new AMI we create
