@@ -1,0 +1,63 @@
+--- # Ansible playbook to configure static webserver
+- hosts: aws
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Execute All Installations
+      yum: name={{ item }} state=latest
+      with_items:
+        - httpd
+        - wget
+      notify: 
+        - CopySiteFiles
+        - RestartHTTPD
+        - WaitForSite
+        - TestTheSite
+        - DisplayResult
+  handlers: # only run if above tasks are completed
+    - name: CopySiteFiles
+      copy: src=../files/index.html dest=/var/www/html/index.html owner=root group=root mode=0655 backup=yes
+    - name: RestartHTTPD
+      service: name=httpd state=restarted
+    - name: WaitForSite
+      wait_for: host={{ ansible_nodename }} port=80 delay=5
+    - name: TestTheSite
+      shell: /usr/bin/wget http://localhost
+      register: site_result
+    - name: DisplayResult
+      debug: var=site_result
+    
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Take snapshot of backup directory
+      ec2_snapshot:
+        region: eu-west-1
+        instance_id: i-094fc8af16f7a5bcf
+        device_name: /dev/xvda
+        description: Static content backup
+        wait: no
+      register: snapshot_results
+      notify:
+        - DisplaySnapShotResults
+        - CreateNewAMITemplate
+        - DisplayAMICreationResults
+  handlers:
+    - name: DisplaySnapShotResults
+      debug: var=snapshot_results
+    - name: CreateNewAMITemplate
+      ec2_ami:
+        instance_id: i-094fc8af16f7a5bcf
+        wait: no
+        name: myansiblewebserver_optimized
+        tags:
+          Name: myansiblewebserver_optimized
+          Service: Testmyansiblewebserver
+      register: ami_results
+    - name: DisplayAMICreationResults
+      debug: var=ami_results

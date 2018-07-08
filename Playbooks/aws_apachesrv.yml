@@ -1,0 +1,57 @@
+--- # Ansible playbook to configure static webserver
+- hosts: aws
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Connect top remote host
+      yum: name=* state=latest
+    - name: Install HTTPD
+      yum: name=httpd state=latest
+    - name: Deploy static website
+      copy: src=../files/index.html dest=/var/www/html/index.html owner=root group=root mode=0655 backup=yes
+    - name: restart HTTPD
+      service: name=httpd state=restarted
+    - name: Wait for HTTP port 80 to be listening
+      wait_for: host=ec2-52-212-12-30.eu-west-1.compute.amazonaws.com port=80 delay=5
+    - name: Install wget
+      yum: name=wget state=latest
+    - name: Test the site
+      shell: /usr/bin/wget http://localhost
+      register: sire_result
+    - name: Display site output
+      debug: var=site_result
+    
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Take snapshot of backup directory
+      ec2_snapshot:
+        region: eu-west-1
+        instance_id: i-094fc8af16f7a5bcf
+        device_name: /dev/xvda
+        description: Static content backup
+        wait: no
+      register: snapshot_results
+    - name: Display results
+      debug: var=snapshot_results
+    - name: Create a new template ami from our instances
+      ec2_ami:
+        instance_id: i-094fc8af16f7a5bcf
+        wait: no
+        name: myansiblewebserver
+        tags:
+          Name: myansiblewebserver
+          Service: Testmyansiblewebserver
+      register: ami_results
+    - name: Display results
+      debug: var=ami_results
+
+
+         
+       
+  
