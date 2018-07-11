@@ -1,0 +1,72 @@
+--- # AWS IAM Module
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Create IAM Managed Policy for AMI backup
+      iam_managed_policy:
+        policy_name: "ami_backup"
+        policy: "{{ lookup('file', '../ami_backup/ami_backup_policy.json') }}"
+        state: present
+
+    - name: Create IAM Role for AMI backup and purge
+      iam_role:
+        name: lambda_ami_backup
+        assume_role_policy_document: "{{ lookup('file','../ami_backup/ami_trust_policy.json') }}"
+        state: present
+        managed_policy:
+          - arn:aws:iam::231871078230:policy/ami_backup
+
+    - name: Create lambda functions
+      lambda:
+        name: '{{ item.name }}'
+        state: present
+        zip_file: '{{ item.zip_file }}'
+        runtime: 'python2.7'
+        role: 'arn:aws:iam::231871078230:role/lambda_ami_backup'
+        handler: '{{ item.handler }}'
+        timeout: 60
+        memory_size: 128
+      with_items:
+        - name: ami-create-backup
+          zip_file: '../ami_backup/create_ami_backup.py.zip'
+          handler: 'create_ami_backup.ec2_ami_backup'
+        - name: ami-purge-backup
+          zip_file: '../ami_backup/ami_purge_backups.py.zip'
+          handler: 'ami_purge_backups.clean_amis'
+
+    - cloudwatchevent_rule:
+        name: '{{ item.name }}'
+        description: "Manages lambda AMIs"
+        schedule_expression: '{{ item.schedule_expression }}'
+        targets:
+          - id: '{{ item.target.id }}'
+            arn: '{{ item.target.arn }}'
+      with_items:
+        - name: daily_ami_backup_rule
+          schedule_expression: "cron(00 23 * * ? *)"
+          targets:
+            - id: id123456789012
+              arn: arn:aws:lambda:eu-west-1:231871078230:function:ami-create-backup
+         - name: daily_ami_purge_rule
+           schedule_expression: "cron(45 23 * * ? *)"
+           targets:
+             - id: id123456789012
+               arn: arn:aws:lambda:eu-west-1:231871078230:function:ami-purge-backup
+
+    - name: Lambda S3 event notification
+      lambda_policy:
+        state: present
+        function_name: '{{ item.function_name }}'
+        statement_id: '{{ item.statment_id }'
+        action: lambda:InvokeFunction
+        principal: events.amazonaws.com
+        source_arn: '{{ item.source_arn }}'
+      with_items:
+
+        function_name: ami_create_backup
+        statement_id: ami_create_backup_invocation
+        source_arn: source_arn: arn:aws:events:eu-west-1:231871078230:rule/daily_ami_backup_rule
+      

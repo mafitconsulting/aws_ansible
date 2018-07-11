@@ -1,0 +1,27 @@
+--- #Copy AMY to regions
+- hosts: localhost
+  connection: local
+  remote_user: test
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: create ami backup user
+      iam:
+        iam_type: user
+        name: "{{ item }}"
+        state: present
+      with_items:
+       - amibackup
+    register: new_ami_user
+ 
+    - name: Create lambda ami backup policy from template
+      iam_policy:
+      iam_type: user
+      iam_name: "{{ item.user }}"
+      policy_name: "aws-lambda-ami-backup_{{ item }}"
+      state: present
+      policy_json: " {{ lookup( 'template', 'lambda_ami_policy.json.j2') }} "
+      with_items:
+        - user: amibackup 
+    register: create_iam_policy
+
